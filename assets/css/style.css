@@ -1,3 +1,21 @@
+/* latin 子集可变字体，自托管：Google Fonts 的 CSS 会阻塞首屏，且对中文读者所在的网络不可靠 */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/space-grotesk-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: dark;
   --page: #0b1219;
@@ -88,14 +106,13 @@ img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 
 h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.02em; line-height: 1.12; }
-p { margin: 0; }
+p { margin: 0; text-wrap: pretty; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
 .skip-link {
@@ -122,6 +139,8 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   white-space: nowrap;
   border: 0;
 }
+
+.nb { white-space: nowrap; }
 
 .shell {
   width: min(100% - 48px, var(--shell));
@@ -219,13 +238,13 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .icon-mark {
   display: inline-block;
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   background-color: var(--accent);
   -webkit-mask: var(--mark) center / contain no-repeat;
   mask: var(--mark) center / contain no-repeat;
 }
-.icon-mark--sm { width: 15px; height: 15px; }
+.icon-mark--sm { width: 17px; height: 17px; }
 
 .progress {
   position: fixed;
@@ -265,7 +284,11 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s var(--ease);
 }
-.nav.is-stuck { border-bottom-color: var(--line); }
+.nav.is-stuck {
+  border-bottom-color: var(--line);
+  box-shadow: 0 18px 40px -32px rgba(4, 10, 14, 0.9);
+}
+[data-theme="light"] .nav.is-stuck { box-shadow: 0 18px 40px -34px rgba(11, 28, 39, 0.35); }
 
 .nav__inner {
   display: flex;
@@ -395,21 +418,31 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   -webkit-mask-image: linear-gradient(102deg, transparent 4%, rgba(0, 0, 0, 0.4) 30%, #000 66%);
   mask-image: linear-gradient(102deg, transparent 4%, rgba(0, 0, 0, 0.4) 30%, #000 66%);
 }
+/* 浅色主题下把深色插画反相成线稿，让它以墨线形式落在浅色页面上 */
 [data-theme="light"] .hero__media img {
-  opacity: 0.7;
-  -webkit-mask-image: linear-gradient(102deg, transparent 22%, rgba(0, 0, 0, 0.3) 48%, #000 78%);
-  mask-image: linear-gradient(102deg, transparent 22%, rgba(0, 0, 0, 0.3) 48%, #000 78%);
+  opacity: 0.5;
+  filter: invert(1) hue-rotate(168deg) saturate(1.4) brightness(0.92) contrast(1.05);
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(102deg, transparent 14%, rgba(0, 0, 0, 0.5) 42%, #000 74%);
+  mask-image: linear-gradient(102deg, transparent 14%, rgba(0, 0, 0, 0.5) 42%, #000 74%);
 }
 
 .hero__inner { position: relative; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__media img { animation: heroSettle 1.5s var(--ease) both; }
+}
+@keyframes heroSettle {
+  from { transform: scale(1.05); }
+  to { transform: scale(1); }
+}
 
 .hero__title {
   font-size: clamp(44px, 6.6vw, 92px);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.06;
-  color: #fff;
-  mix-blend-mode: difference;
+  color: var(--text);
 }
 .hero__sub {
   margin-top: 24px;
@@ -582,7 +615,7 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .cfg {
@@ -663,6 +696,8 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .cfg__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 
 .console {
+  display: flex;
+  flex-direction: column;
   border-radius: var(--r-panel);
   border: 1px solid var(--line);
   background: var(--term-bg);
@@ -704,11 +739,29 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .copy-btn.is-error { border-color: #ff8a7a; color: #ff8a7a; }
 
 .console__body {
+  flex: 1;
   min-height: 168px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 22px 20px;
 }
+.console__empty { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+.console__prompt {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--term-accent);
+}
+.console__caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  margin-left: 7px;
+  vertical-align: text-bottom;
+  background: var(--term-accent);
+  animation: caretBlink 1.1s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
 .console__note { color: var(--term-dim); font-size: 14.5px; line-height: 1.75; max-width: 40ch; }
 .console__note--error { color: #ff9b8c; }
 .console__code {
@@ -774,12 +827,13 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   height: 100%;
   object-fit: cover;
   object-position: 50% 50%;
+  filter: brightness(1.5) saturate(1.15);
 }
 .band__scrim {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgba(8, 13, 18, 0.9) 0%, rgba(8, 13, 18, 0.72) 46%, rgba(8, 13, 18, 0.42) 100%);
+  background: linear-gradient(90deg, rgba(8, 13, 18, 0.9) 0%, rgba(8, 13, 18, 0.62) 46%, rgba(8, 13, 18, 0.16) 100%);
 }
 .band__inner { padding-block: clamp(56px, 8vw, 96px); }
 .band__quote {
@@ -798,6 +852,20 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   font-size: clamp(15.5px, 1.1vw, 17.5px);
   line-height: 1.8;
 }
+
+/* 浅色主题下 band 不反相成黑块：换成与 bento 同源的网格底纹 */
+[data-theme="light"] .band { background: var(--surface-2); }
+[data-theme="light"] .band__media { display: none; }
+[data-theme="light"] .band__scrim {
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(88% 100% at 76% 50%, #000 8%, transparent 74%);
+  mask-image: radial-gradient(88% 100% at 76% 50%, #000 8%, transparent 74%);
+}
+[data-theme="light"] .band__quote { color: var(--text); }
+[data-theme="light"] .band__body { color: var(--text-2); }
 
 .bento {
   margin-top: 40px;
@@ -1077,7 +1145,7 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 46%, #000 88%);
     mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 46%, #000 88%);
   }
-  [data-theme="light"] .hero__media img { opacity: 0.4; }
+  [data-theme="light"] .hero__media img { opacity: 0.16; }
   .hero__title { max-width: 100%; }
   .thanks { align-items: flex-start; }
   .thanks__brand { margin-left: 0; }
@@ -1116,5 +1184,5 @@ fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 @media print {
   .nav, .progress, .cfg-wrap, .hero__media, .protocol__stage, body::after { display: none; }
   body { background: #fff; color: #000; }
-  .hero__title { color: #000; mix-blend-mode: normal; }
+  .hero__title { color: #000; }
 }
